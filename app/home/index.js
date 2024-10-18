@@ -6,7 +6,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { theme } from "@/constants/theme";
@@ -14,6 +14,9 @@ import { hp, wp } from "@/helpers/common";
 import Categories from "@/components/categories";
 import { apiCall } from "@/api";
 import ImageGrid from "@/components/imageGrid";
+import { debounce } from "lodash";
+
+var page = 1;
 
 const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
@@ -43,6 +46,27 @@ const HomeScreen = () => {
       }
     }
   };
+
+  // ====================================================
+  const handleSearch = (text) => {
+    setSearch(text);
+
+    if (text.length > 2) {
+      page = 1;
+      setImages([]);
+      fetchImages({ page, q: text });
+    }
+
+    if (text == "") {
+      page = 1;
+      searchInputRef?.current?.clear();
+      setImages([]);
+      fetchImages({ page });
+    }
+  };
+
+  const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
+
   // ===========================================
   return (
     <View style={[styles.container, { paddingTop }]}>
@@ -72,13 +96,16 @@ const HomeScreen = () => {
           </View>
           <TextInput
             placeholder="Serch"
-            style={styles.searchInput}
-            value={search}
-            onChangeText={(value) => setSearch(value)}
             ref={searchInputRef}
+            // value={search}
+            onChangeText={handleTextDebounce}
+            style={styles.searchInput}
           />
           {search && (
-            <Pressable style={styles.closeIcon}>
+            <Pressable
+              style={styles.closeIcon}
+              onPress={() => handleSearch("")}
+            >
               <Ionicons
                 name="close"
                 size={24}
