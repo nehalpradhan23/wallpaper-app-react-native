@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { theme } from "@/constants/theme";
 import { hp, wp } from "@/helpers/common";
+import Categories from "@/components/categories";
 
 const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
@@ -18,6 +19,12 @@ const HomeScreen = () => {
 
   const [search, setSearch] = useState("");
   const searchInputRef = useRef(null);
+
+  const [activeCategory, setActiveCategory] = useState(null);
+
+  const handleChangeCategory = (cat) => {
+    setActiveCategory(cat);
+  };
 
   // ===========================================
   return (
@@ -62,6 +69,13 @@ const HomeScreen = () => {
               />
             </Pressable>
           )}
+        </View>
+        {/* categories ----------------------------- */}
+        <View style={styles.categories}>
+          <Categories
+            activeCategory={activeCategory}
+            handleChangeCategory={handleChangeCategory}
+          />
         </View>
       </ScrollView>
     </View>
