@@ -1,29 +1,38 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { StatusBar } from "expo-status-bar";
-import { hp, wp } from "../helpers/common";
+import { getColumnCount, hp, wp } from "../helpers/common";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { theme } from "../constants/theme";
 import { router } from "expo-router";
 
 const WelcomeScreen = () => {
+  const deviceWidth = getColumnCount();
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      <Image
-        source={require("../assets/images/welcome.jpeg")}
-        style={styles.bgImage}
-        resizeMode="cover"
-      />
+      {deviceWidth === 2 ? (
+        <Image
+          source={require("../assets/images/welcome.jpeg")}
+          style={styles.bgImage}
+          resizeMode="cover"
+        />
+      ) : (
+        <Image
+          source={require("../assets/images/welcome2.jpg")}
+          style={styles.bgImage}
+          resizeMode="cover"
+        />
+      )}
       {/* linear gradient ================================ */}
       <Animated.View entering={FadeInDown.duration(600)} style={{ flex: 1 }}>
         <LinearGradient
           colors={[
             "rgba(255,255,255,0)",
             "rgba(255,255,255,0.4)",
-            "rgba(255,255,255,0.6)",
-            // "white",
+            // "rgba(255,255,255,0.6)",
+            "white",
             "white",
           ]}
           style={styles.gradient}
