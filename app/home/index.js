@@ -15,19 +15,29 @@ import Categories from "@/components/categories";
 import { apiCall } from "@/api";
 import ImageGrid from "@/components/imageGrid";
 import { debounce } from "lodash";
+import FiltersModal from "@/components/filtersModal";
 
 var page = 1;
 
 const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
   const paddingTop = top > 0 ? top + 10 : 30;
-
   const [search, setSearch] = useState("");
   const searchInputRef = useRef(null);
-
   const [images, setImages] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
+  const modalRef = useRef(null);
+  const [filters, setFilters] = useState(null);
 
+  // ===========================================================
+  const applyFilters = () => {
+    console.log("applying filter");
+    closeFiltersModal();
+  };
+  const resetFilters = () => {
+    console.log("resetting filter");
+    closeFiltersModal();
+  };
   // ===========================================================
   const handleChangeCategory = (cat) => {
     setActiveCategory(cat);
@@ -83,6 +93,14 @@ const HomeScreen = () => {
 
   const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
 
+  // open filter
+  const openFiltersModal = () => {
+    modalRef?.current?.present();
+  };
+  const closeFiltersModal = () => {
+    modalRef?.current?.close();
+  };
+
   // ===========================================
   return (
     <View style={[styles.container, { paddingTop }]}>
@@ -91,7 +109,8 @@ const HomeScreen = () => {
         <Pressable>
           <Text style={styles.title}>Pixels</Text>
         </Pressable>
-        <Pressable>
+        {/* filter button ------------------------------- */}
+        <Pressable onPress={openFiltersModal}>
           <FontAwesome6
             name="bars-staggered"
             size={22}
@@ -141,6 +160,15 @@ const HomeScreen = () => {
         {/* images --------------------------------------- */}
         <View>{images.length > 0 && <ImageGrid images={images} />}</View>
       </ScrollView>
+      {/* filter modal ==================================== */}
+      <FiltersModal
+        modalRef={modalRef}
+        filters={filters}
+        setFilters={setFilters}
+        onClose={closeFiltersModal}
+        onApply={applyFilters}
+        onReset={resetFilters}
+      />
     </View>
   );
 };
