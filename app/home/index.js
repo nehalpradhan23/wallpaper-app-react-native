@@ -28,8 +28,17 @@ const HomeScreen = () => {
   const [images, setImages] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
 
+  // ===========================================================
   const handleChangeCategory = (cat) => {
     setActiveCategory(cat);
+    clearSearch();
+    setImages([]);
+    page = 1;
+    let params = {
+      page,
+    };
+    if (cat) params.category = cat;
+    fetchImages(params, false);
   };
 
   useEffect(() => {
@@ -54,15 +63,22 @@ const HomeScreen = () => {
     if (text.length > 2) {
       page = 1;
       setImages([]);
-      fetchImages({ page, q: text });
+      fetchImages({ page, q: text }, false);
+      setActiveCategory(null);
     }
 
     if (text == "") {
       page = 1;
       searchInputRef?.current?.clear();
+      setActiveCategory(null);
       setImages([]);
-      fetchImages({ page });
+      fetchImages({ page }, false);
     }
+  };
+
+  const clearSearch = () => {
+    setSearch("");
+    searchInputRef?.current?.clear();
   };
 
   const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
