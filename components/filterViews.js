@@ -12,6 +12,9 @@ export const SectionView = ({ title, content }) => {
 };
 
 export const CommonFilterRow = ({ data, filterName, filters, setFilters }) => {
+  const onSelect = (item) => {
+    setFilters({ ...filters, [filterName]: item });
+  };
   return (
     <View style={styles.flexRowWrap}>
       {data &&
@@ -21,12 +24,35 @@ export const CommonFilterRow = ({ data, filterName, filters, setFilters }) => {
           let color = isActive ? "white" : theme.colors.neutral(0.7);
           return (
             <Pressable
+              onPress={() => onSelect(item)}
               key={item}
               style={[styles.outlinedButton, { backgroundColor }]}
             >
               <Text style={[styles.outlinedButtonText, { color }]}>
                 {capitalize(item)}
               </Text>
+            </Pressable>
+          );
+        })}
+    </View>
+  );
+};
+
+export const ColorFilter = ({ data, filterName, filters, setFilters }) => {
+  const onSelect = (item) => {
+    setFilters({ ...filters, [filterName]: item });
+  };
+  return (
+    <View style={styles.flexRowWrap}>
+      {data &&
+        data.map((item, index) => {
+          let isActive = filters && filters[filterName] == item;
+          let borderColor = isActive ? theme.colors.neutral(0.4) : "white";
+          return (
+            <Pressable onPress={() => onSelect(item)} key={item}>
+              <View style={[styles.colorWrapper, { borderColor }]}>
+                <View style={[styles.color, { backgroundColor: item }]}></View>
+              </View>
             </Pressable>
           );
         })}
@@ -43,6 +69,11 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeights.medium,
     color: theme.colors.neutral(0.8),
   },
+  flexRowWrap: {
+    gap: 10,
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
   outlinedButton: {
     padding: 8,
     paddingHorizontal: 14,
@@ -51,10 +82,18 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.xs,
     borderCurve: "continuous",
   },
-  flexRowWrap: {
-    gap: 10,
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
+
   outlinedButtonText: {},
+  colorWrapper: {
+    padding: 3,
+    borderRadius: theme.radius.sm,
+    borderCurve: "continuous",
+    borderWidth: 2,
+  },
+  color: {
+    height: 30,
+    width: 40,
+    borderRadius: theme.radius.sm - 3,
+    borderCurve: "continuous",
+  },
 });

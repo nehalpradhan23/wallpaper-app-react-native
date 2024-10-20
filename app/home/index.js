@@ -36,7 +36,8 @@ const HomeScreen = () => {
   };
   const resetFilters = () => {
     console.log("resetting filter");
-    closeFiltersModal();
+    setFilters(null);
+    // closeFiltersModal();
   };
   // ===========================================================
   const handleChangeCategory = (cat) => {
