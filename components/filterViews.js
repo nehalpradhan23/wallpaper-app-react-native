@@ -13,8 +13,23 @@ export const SectionView = ({ title, content }) => {
 
 export const CommonFilterRow = ({ data, filterName, filters, setFilters }) => {
   const onSelect = (item) => {
-    setFilters({ ...filters, [filterName]: item });
+    // if not empty
+    if (filters) {
+      const selected = filters[filterName] === item; // if item already selected
+
+      if (selected) {
+        // remove
+        const newFilters = { ...filters };
+        delete newFilters[filterName];
+        setFilters(newFilters);
+      } else {
+        setFilters({ ...filters, [filterName]: item });
+      }
+    } else {
+      setFilters({ ...filters, [filterName]: item });
+    }
   };
+
   return (
     <View style={styles.flexRowWrap}>
       {data &&
@@ -40,7 +55,18 @@ export const CommonFilterRow = ({ data, filterName, filters, setFilters }) => {
 
 export const ColorFilter = ({ data, filterName, filters, setFilters }) => {
   const onSelect = (item) => {
-    setFilters({ ...filters, [filterName]: item });
+    if (filters) {
+      const selected = filters[filterName] === item;
+      if (selected) {
+        const newFilters = { ...filters };
+        delete newFilters[filterName];
+        setFilters(newFilters);
+      } else {
+        setFilters({ ...filters, [filterName]: item });
+      }
+    } else {
+      setFilters({ ...filters, [filterName]: item });
+    }
   };
   return (
     <View style={styles.flexRowWrap}>
