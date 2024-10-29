@@ -29,8 +29,11 @@ const HomeScreen = () => {
   const [activeCategory, setActiveCategory] = useState(null);
   const modalRef = useRef(null);
   const [filters, setFilters] = useState(null);
+  const scrollRef = useRef(null);
+  const [isEndReached, setIsEndReached] = useState(false);
 
   // ===========================================================
+
   const applyFilters = () => {
     if (filters) {
       page = 1;
@@ -45,6 +48,7 @@ const HomeScreen = () => {
     }
     closeFiltersModal();
   };
+
   const resetFilters = () => {
     if (filters) {
       page = 1;
@@ -94,7 +98,7 @@ const HomeScreen = () => {
     fetchImages();
   }, []);
 
-  const fetchImages = async (params = { page: 1 }, append = false) => {
+  const fetchImages = async (params = { page: 1 }, append = true) => {
     let res = await apiCall(params);
     if (res.success && res?.data?.hits) {
       if (append) {
@@ -130,6 +134,40 @@ const HomeScreen = () => {
     searchInputRef?.current?.clear();
   };
 
+  // ================================================
+  const handleScroll = (event) => {
+    const contentHeight = event.nativeEvent.contentSize.height; // scroll view content size/height
+    const scrollViewHeight = event.nativeEvent.layoutMeasurement.height; // screen size
+    const scrollOffset = event.nativeEvent.contentOffset.y; // position of scrollview y (top and bottom) in screen
+    const bottomPosition = contentHeight - scrollViewHeight;
+
+    // avoid multiple calls when reached bottom --------------------------
+    if (scrollOffset >= bottomPosition - 1) {
+      if (!isEndReached) {
+        setIsEndReached(true);
+        console.log("reached bottom - ");
+        // fetch more images
+        ++page;
+        let params = {
+          page,
+          ...filters,
+        };
+        if (activeCategory) params.category = activeCategory;
+        if (search) params.q = search;
+        fetchImages(params);
+      }
+    } else if (isEndReached) {
+      setIsEndReached(false);
+    }
+  };
+
+  const handleScrollUp = () => {
+    scrollRef?.current?.scrollTo({
+      y: 0,
+      animated: true,
+    });
+  };
+
   const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
 
   // open filter
@@ -145,7 +183,7 @@ const HomeScreen = () => {
     <View style={[styles.container, { paddingTop }]}>
       {/* header ========================== */}
       <View style={styles.header}>
-        <Pressable>
+        <Pressable onPress={handleScrollUp}>
           <Text style={styles.title}>Pixels</Text>
         </Pressable>
         {/* filter button ------------------------------- */}
@@ -158,7 +196,12 @@ const HomeScreen = () => {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={{ gap: 15 }}>
+      <ScrollView
+        onScroll={handleScroll}
+        scrollEventThrottle={5} // times scroll event will fire on scrolling (in ms)
+        ref={scrollRef}
+        contentContainerStyle={{ gap: 15 }}
+      >
         {/* search bar ----------------------------- */}
         <View style={styles.searchBar}>
           <View style={styles.searchIcon}>
